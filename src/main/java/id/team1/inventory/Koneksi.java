@@ -29,4 +29,13 @@ public class Koneksi {
             return null;
         }
     }
+
+    public static String prepareLike(String arg) {
+        arg = arg
+            .replace("!", "!!")
+            .replace("%", "!%")
+            .replace("_", "!_")
+            .replace("[", "![");
+        return "%" + arg + "%";
+    }
 }
