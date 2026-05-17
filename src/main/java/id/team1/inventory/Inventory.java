@@ -11,6 +11,6 @@ package id.team1.inventory;
 public class Inventory {
 
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        java.awt.EventQueue.invokeLater(() -> new MainFrame().setVisible(true));
     }
 }
