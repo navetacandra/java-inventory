@@ -102,7 +102,7 @@ public class Kategori {
         PreparedStatement stmt = null;
         try {
             stmt = sqlCon.prepareStatement(
-                "DELETE FROM Kategori SET WHERE IdKategori=?"
+                "DELETE FROM Kategori WHERE IdKategori=?"
             );
             stmt.setInt(1, idKategori);
             stmt.execute();
