@@ -3,27 +3,23 @@ DROP TABLE IF EXISTS Barang;
 DROP TABLE IF EXISTS Kategori;
 
 CREATE TABLE `Kategori` (
-  `IdKategori` int(11) NOT NULL AUTO_INCREMENT,
-  `NamaKategori` varchar(100) NOT NULL,
-  PRIMARY KEY (`IdKategori`),
-  UNIQUE KEY `NamaKategori` (`NamaKategori`)
+  `IdKategori` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  `NamaKategori` varchar(100) NOT NULL UNIQUE
 );
 
 CREATE TABLE `Barang` (
-  `IdBarang` int(11) NOT NULL AUTO_INCREMENT,
+  `IdBarang` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `IdKategori` int(11) NOT NULL,
   `NamaBarang` varchar(100) NOT NULL,
   `JumlahBarang` int(11) NOT NULL,
-  PRIMARY KEY (`IdBarang`),
-  KEY `IdKategori` (`IdKategori`),
   FOREIGN KEY (`IdKategori`) REFERENCES `Kategori` (`IdKategori`) ON DELETE CASCADE
 );
 
 CREATE TABLE `Transaksi` (
+  `IdTransaksi` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `IdBarang` int(11) NOT NULL,
   `TipeTransaksi` enum('Masuk','Keluar') NOT NULL,
   `JumlahTransaksi` int(11) NOT NULL,
-  KEY `IdBarang` (`IdBarang`),
   FOREIGN KEY (`IdBarang`) REFERENCES `Barang` (`IdBarang`) ON DELETE CASCADE
 );
 
