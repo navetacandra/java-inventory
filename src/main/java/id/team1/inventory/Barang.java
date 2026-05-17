@@ -7,6 +7,7 @@ package id.team1.inventory;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import javax.swing.JOptionPane;
 
 /**
@@ -66,12 +67,25 @@ public class Barang {
         PreparedStatement stmt = null;
         try {
             stmt = sqlCon.prepareStatement(
-                "INSERT INTO Barang (IdKategori, NamaBarang, JumlahBarang) VALUES (?, ?, ?)"
+                "INSERT INTO Barang (IdKategori, NamaBarang, JumlahBarang) VALUES (?, ?, 0)",
+                Statement.RETURN_GENERATED_KEYS
             );
             stmt.setInt(1, idKategori);
             stmt.setString(2, namaBarang);
-            stmt.setInt(3, jumlahBarang);
+
             stmt.execute();
+            ResultSet res = stmt.getGeneratedKeys();
+            if (res.next()) {
+                System.out.println(res.getInt(1));
+                if (jumlahBarang > 0) {
+                    Transaksi.create(
+                        sqlCon,
+                        res.getInt(1),
+                        "Masuk",
+                        jumlahBarang
+                    );
+                }
+            }
         } catch (Exception e) {
             JOptionPane.showMessageDialog(
                 null,
