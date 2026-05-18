@@ -259,6 +259,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel6.setText("Stok Awal :");
 
         btnSimpanBarang.setText("Simpan");
+        btnSimpanBarang.addActionListener(this::btnSimpanBarangActionPerformed);
 
         btnEditBarang.setText("Edit");
 
@@ -574,6 +575,63 @@ public class MainFrame extends javax.swing.JFrame {
             logger.log(java.util.logging.Level.SEVERE, "Error searching barang", ex);
         }
     }//GEN-LAST:event_btnCariBarangActionPerformed
+
+    private void btnSimpanBarangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanBarangActionPerformed
+        String namaBarang = txtNamaBarang.getText().trim();
+        String stokText = txtStokBarang.getText().trim();
+        String namaKategori = (String) cmbKategoriBarang.getSelectedItem();
+
+        if (namaBarang.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Nama barang tidak boleh kosong!");
+            return;
+        }
+
+        int stokAwal = 0;
+        if (!stokText.isEmpty()) {
+            try {
+                stokAwal = Integer.parseInt(stokText);
+                if (stokAwal < 0) {
+                    javax.swing.JOptionPane.showMessageDialog(this, "Stok awal tidak boleh negatif!");
+                    return;
+                }
+            } catch (NumberFormatException ex) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Stok awal harus berupa angka valid!");
+                return;
+            }
+        }
+
+        if (namaKategori == null || namaKategori.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Pilih kategori terlebih dahulu!");
+            return;
+        }
+
+        try (java.sql.Connection conn = Koneksi.createConnection()) {
+            if (conn != null) {
+                // Find exact IdKategori
+                int idKategori = -1;
+                try (java.sql.PreparedStatement stmt = conn.prepareStatement("SELECT IdKategori FROM Kategori WHERE NamaKategori = ?")) {
+                    stmt.setString(1, namaKategori);
+                    try (java.sql.ResultSet res = stmt.executeQuery()) {
+                        if (res.next()) {
+                            idKategori = res.getInt("IdKategori");
+                        }
+                    }
+                }
+
+                if (idKategori == -1) {
+                    javax.swing.JOptionPane.showMessageDialog(this, "Kategori tidak ditemukan di database!");
+                    return;
+                }
+
+                Barang.create(conn, idKategori, namaBarang, stokAwal);
+                txtNamaBarang.setText("");
+                txtStokBarang.setText("");
+                loadBarang();
+            }
+        } catch (java.sql.SQLException ex) {
+            logger.log(java.util.logging.Level.SEVERE, "Error saving barang", ex);
+        }
+    }//GEN-LAST:event_btnSimpanBarangActionPerformed
     /**
      * @param args the command line arguments
      */
