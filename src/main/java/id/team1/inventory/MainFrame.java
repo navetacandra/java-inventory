@@ -11,6 +11,7 @@ package id.team1.inventory;
 public class MainFrame extends javax.swing.JFrame {
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MainFrame.class.getName());
+    private final java.sql.Connection conn = Koneksi.createConnection();
 
     /**
      * Creates new form MainFrame
@@ -24,7 +25,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void loadKategoriToCombo() {
         cmbKategoriBarang.removeAllItems();
-        try (java.sql.Connection conn = Koneksi.createConnection()) {
+        try {
             if (conn != null) {
                 java.sql.ResultSet res = Kategori.get(conn);
                 while (res != null && res.next()) {
@@ -38,7 +39,7 @@ public class MainFrame extends javax.swing.JFrame {
 
     private void loadTransaksiToCombo() {
         cmbBarangTransaksi.removeAllItems();
-        try (java.sql.Connection conn = Koneksi.createConnection()) {
+        try {
             if (conn != null) {
                 java.sql.ResultSet res = Barang.get(conn);
                 while (res != null && res.next()) {
@@ -54,7 +55,7 @@ public class MainFrame extends javax.swing.JFrame {
         loadTransaksiToCombo();
         javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblBarang.getModel();
         model.setRowCount(0);
-        try (java.sql.Connection conn = Koneksi.createConnection()) {
+        try {
             if (conn != null) {
                 java.sql.ResultSet res = Barang.get(conn);
                 while (res != null && res.next()) {
@@ -75,7 +76,7 @@ public class MainFrame extends javax.swing.JFrame {
         loadKategoriToCombo();
         javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblKategori.getModel();
         model.setRowCount(0);
-        try (java.sql.Connection conn = Koneksi.createConnection()) {
+        try {
             if (conn != null) {
                 java.sql.ResultSet res = Kategori.get(conn);
                 while (res != null && res.next()) {
@@ -93,7 +94,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void loadTransaksi() {
         javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblTransaksi.getModel();
         model.setRowCount(0);
-        try (java.sql.Connection conn = Koneksi.createConnection()) {
+        try {
             if (conn != null) {
                 java.sql.ResultSet res = Transaksi.get(conn);
                 while (res != null && res.next()) {
@@ -513,14 +514,10 @@ public class MainFrame extends javax.swing.JFrame {
             return;
         }
 
-        try (java.sql.Connection conn = Koneksi.createConnection()) {
-            if (conn != null) {
-                Kategori.create(conn, nama);
-                txtNamaKategori.setText("");
-                loadKategori();
-            }
-        } catch (java.sql.SQLException ex) {
-            logger.log(java.util.logging.Level.SEVERE, "Error saving kategori", ex);
+        if (conn != null) {
+            Kategori.create(conn, nama);
+            txtNamaKategori.setText("");
+            loadKategori();
         }
     }//GEN-LAST:event_btnSimpanKategoriActionPerformed
 
@@ -542,14 +539,10 @@ public class MainFrame extends javax.swing.JFrame {
         );
 
         if (confirm == javax.swing.JOptionPane.YES_OPTION) {
-            try (java.sql.Connection conn = Koneksi.createConnection()) {
-                if (conn != null) {
-                    Kategori.delete(conn, id);
-                    txtNamaKategori.setText("");
-                    loadKategori();
-                }
-            } catch (java.sql.SQLException ex) {
-                logger.log(java.util.logging.Level.SEVERE, "Error deleting kategori", ex);
+            if (conn != null) {
+                Kategori.delete(conn, id);
+                txtNamaKategori.setText("");
+                loadKategori();
             }
         }
     }//GEN-LAST:event_btnHapusKategoriActionPerformed
@@ -569,14 +562,10 @@ public class MainFrame extends javax.swing.JFrame {
             return;
         }
 
-        try (java.sql.Connection conn = Koneksi.createConnection()) {
-            if (conn != null) {
-                Kategori.update(conn, id, nama);
-                txtNamaKategori.setText("");
-                loadKategori();
-            }
-        } catch (java.sql.SQLException ex) {
-            logger.log(java.util.logging.Level.SEVERE, "Error updating kategori", ex);
+        if (conn != null) {
+            Kategori.update(conn, id, nama);
+            txtNamaKategori.setText("");
+            loadKategori();
         }
     }//GEN-LAST:event_btnEditKategoriActionPerformed
 
@@ -592,7 +581,7 @@ public class MainFrame extends javax.swing.JFrame {
         javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblKategori.getModel();
         model.setRowCount(0);
 
-        try (java.sql.Connection conn = Koneksi.createConnection()) {
+        try {
             if (conn != null) {
                 java.sql.ResultSet res = Kategori.find(conn, query);
                 while (res != null && res.next()) {
@@ -619,7 +608,7 @@ public class MainFrame extends javax.swing.JFrame {
         javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblBarang.getModel();
         model.setRowCount(0);
 
-        try (java.sql.Connection conn = Koneksi.createConnection()) {
+        try {
             if (conn != null) {
                 java.sql.ResultSet res = Barang.find(conn, query);
                 while (res != null && res.next()) {
@@ -665,7 +654,7 @@ public class MainFrame extends javax.swing.JFrame {
             return;
         }
 
-        try (java.sql.Connection conn = Koneksi.createConnection()) {
+        try {
             if (conn != null) {
                 // Find exact IdKategori
                 int idKategori = -1;
@@ -712,16 +701,12 @@ public class MainFrame extends javax.swing.JFrame {
         );
 
         if (confirm == javax.swing.JOptionPane.YES_OPTION) {
-            try (java.sql.Connection conn = Koneksi.createConnection()) {
-                if (conn != null) {
-                    Barang.delete(conn, id);
-                    txtNamaBarang.setText("");
-                    txtStokBarang.setText("");
-                    loadBarang();
-                    loadTransaksi();
-                }
-            } catch (java.sql.SQLException ex) {
-                logger.log(java.util.logging.Level.SEVERE, "Error deleting barang", ex);
+            if (conn != null) {
+                Barang.delete(conn, id);
+                txtNamaBarang.setText("");
+                txtStokBarang.setText("");
+                loadBarang();
+                loadTransaksi();
             }
         }
     }//GEN-LAST:event_btnHapusBarangActionPerformed
@@ -758,7 +743,7 @@ public class MainFrame extends javax.swing.JFrame {
             return;
         }
 
-        try (java.sql.Connection conn = Koneksi.createConnection()) {
+        try {
             if (conn != null) {
                 int idKategori = -1;
                 try (java.sql.PreparedStatement stmt = conn.prepareStatement("SELECT IdKategori FROM Kategori WHERE NamaKategori = ?")) {
@@ -827,7 +812,7 @@ public class MainFrame extends javax.swing.JFrame {
 
         int idBarang = Integer.parseInt(selectedBarang.split(" - ")[0]);
 
-        try (java.sql.Connection conn = Koneksi.createConnection()) {
+        try {
             if (conn != null) {
                 // If "Keluar", check if enough stock
                 if ("Keluar".equals(tipe)) {
