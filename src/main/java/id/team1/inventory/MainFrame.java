@@ -105,6 +105,26 @@ public class MainFrame extends javax.swing.JFrame {
                 }
             }
         });
+
+        btnCariKategori.addActionListener(e -> {
+            String query = txtCariKategori.getText().trim();
+            javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblKategori.getModel();
+            model.setRowCount(0);
+
+            try (java.sql.Connection conn = Koneksi.createConnection()) {
+                if (conn != null) {
+                    java.sql.ResultSet res = Kategori.find(conn, query);
+                    while (res != null && res.next()) {
+                        model.addRow(new Object[]{
+                            res.getInt("IdKategori"),
+                            res.getString("NamaKategori")
+                        });
+                    }
+                }
+            } catch (java.sql.SQLException ex) {
+                logger.log(java.util.logging.Level.SEVERE, "Error searching kategori", ex);
+            }
+        });
     }
 
     private void loadKategori() {
