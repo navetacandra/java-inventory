@@ -18,113 +18,6 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
         loadKategori();
-        initEventHandlers();
-    }
-
-    private void initEventHandlers() {
-        btnSimpanKategori.addActionListener(e -> {
-            String nama = txtNamaKategori.getText().trim();
-            if (nama.isEmpty()) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Nama kategori tidak boleh kosong!");
-                return;
-            }
-
-            try (java.sql.Connection conn = Koneksi.createConnection()) {
-                if (conn != null) {
-                    Kategori.create(conn, nama);
-                    txtNamaKategori.setText("");
-                    loadKategori();
-                }
-            } catch (java.sql.SQLException ex) {
-                logger.log(java.util.logging.Level.SEVERE, "Error saving kategori", ex);
-            }
-        });
-
-        btnHapusKategori.addActionListener(e -> {
-            int selectedRow = tblKategori.getSelectedRow();
-            if (selectedRow == -1) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Pilih kategori yang ingin dihapus!");
-                return;
-            }
-
-            int id = (int) tblKategori.getValueAt(selectedRow, 0);
-            String nama = (String) tblKategori.getValueAt(selectedRow, 1);
-
-            int confirm = javax.swing.JOptionPane.showConfirmDialog(
-                this,
-                "Apakah Anda yakin ingin menghapus kategori '" + nama + "'?",
-                "Konfirmasi Hapus",
-                javax.swing.JOptionPane.YES_NO_OPTION
-            );
-
-            if (confirm == javax.swing.JOptionPane.YES_OPTION) {
-                try (java.sql.Connection conn = Koneksi.createConnection()) {
-                    if (conn != null) {
-                        Kategori.delete(conn, id);
-                        txtNamaKategori.setText("");
-                        loadKategori();
-                    }
-                } catch (java.sql.SQLException ex) {
-                    logger.log(java.util.logging.Level.SEVERE, "Error deleting kategori", ex);
-                }
-            }
-        });
-
-        btnEditKategori.addActionListener(e -> {
-            int selectedRow = tblKategori.getSelectedRow();
-            if (selectedRow == -1) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Pilih kategori yang ingin diubah!");
-                return;
-            }
-
-            int id = (int) tblKategori.getValueAt(selectedRow, 0);
-            String nama = txtNamaKategori.getText().trim();
-
-            if (nama.isEmpty()) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Nama kategori tidak boleh kosong!");
-                return;
-            }
-
-            try (java.sql.Connection conn = Koneksi.createConnection()) {
-                if (conn != null) {
-                    Kategori.update(conn, id, nama);
-                    txtNamaKategori.setText("");
-                    loadKategori();
-                }
-            } catch (java.sql.SQLException ex) {
-                logger.log(java.util.logging.Level.SEVERE, "Error updating kategori", ex);
-            }
-        });
-
-        tblKategori.addMouseListener(new java.awt.event.MouseAdapter() {
-            @Override
-            public void mouseClicked(java.awt.event.MouseEvent e) {
-                int selectedRow = tblKategori.getSelectedRow();
-                if (selectedRow != -1) {
-                    txtNamaKategori.setText(tblKategori.getValueAt(selectedRow, 1).toString());
-                }
-            }
-        });
-
-        btnCariKategori.addActionListener(e -> {
-            String query = txtCariKategori.getText().trim();
-            javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblKategori.getModel();
-            model.setRowCount(0);
-
-            try (java.sql.Connection conn = Koneksi.createConnection()) {
-                if (conn != null) {
-                    java.sql.ResultSet res = Kategori.find(conn, query);
-                    while (res != null && res.next()) {
-                        model.addRow(new Object[]{
-                            res.getInt("IdKategori"),
-                            res.getString("NamaKategori")
-                        });
-                    }
-                }
-            } catch (java.sql.SQLException ex) {
-                logger.log(java.util.logging.Level.SEVERE, "Error searching kategori", ex);
-            }
-        });
     }
 
     private void loadKategori() {
@@ -204,6 +97,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel1.setText("Cari :");
 
         btnCariKategori.setText("Cari");
+        btnCariKategori.addActionListener(this::btnCariKategoriActionPerformed);
 
         tblKategori.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -221,17 +115,26 @@ public class MainFrame extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        tblKategori.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblKategoriMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblKategori);
 
         jLabel2.setText("Nama Kategori :");
 
         btnSimpanKategori.setText("Simpan");
+        btnSimpanKategori.addActionListener(this::btnSimpanKategoriActionPerformed);
 
         btnEditKategori.setText("Edit");
+        btnEditKategori.addActionListener(this::btnEditKategoriActionPerformed);
 
         btnHapusKategori.setText("Hapus");
+        btnHapusKategori.addActionListener(this::btnHapusKategoriActionPerformed);
 
         btnResetKategori.setText("Reset");
+        btnResetKategori.addActionListener(this::btnResetKategoriActionPerformed);
 
         javax.swing.GroupLayout panelKategoriLayout = new javax.swing.GroupLayout(panelKategori);
         panelKategori.setLayout(panelKategoriLayout);
@@ -504,6 +407,113 @@ public class MainFrame extends javax.swing.JFrame {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnSimpanKategoriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanKategoriActionPerformed
+        String nama = txtNamaKategori.getText().trim();
+        if (nama.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Nama kategori tidak boleh kosong!");
+            return;
+        }
+
+        try (java.sql.Connection conn = Koneksi.createConnection()) {
+            if (conn != null) {
+                Kategori.create(conn, nama);
+                txtNamaKategori.setText("");
+                loadKategori();
+            }
+        } catch (java.sql.SQLException ex) {
+            logger.log(java.util.logging.Level.SEVERE, "Error saving kategori", ex);
+        }
+    }//GEN-LAST:event_btnSimpanKategoriActionPerformed
+
+    private void btnHapusKategoriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusKategoriActionPerformed
+        int selectedRow = tblKategori.getSelectedRow();
+        if (selectedRow == -1) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Pilih kategori yang ingin dihapus!");
+            return;
+        }
+
+        int id = (int) tblKategori.getValueAt(selectedRow, 0);
+        String nama = (String) tblKategori.getValueAt(selectedRow, 1);
+
+        int confirm = javax.swing.JOptionPane.showConfirmDialog(
+            this,
+            "Apakah Anda yakin ingin menghapus kategori '" + nama + "'?",
+            "Konfirmasi Hapus",
+            javax.swing.JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+            try (java.sql.Connection conn = Koneksi.createConnection()) {
+                if (conn != null) {
+                    Kategori.delete(conn, id);
+                    txtNamaKategori.setText("");
+                    loadKategori();
+                }
+            } catch (java.sql.SQLException ex) {
+                logger.log(java.util.logging.Level.SEVERE, "Error deleting kategori", ex);
+            }
+        }
+    }//GEN-LAST:event_btnHapusKategoriActionPerformed
+
+    private void btnEditKategoriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditKategoriActionPerformed
+        int selectedRow = tblKategori.getSelectedRow();
+        if (selectedRow == -1) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Pilih kategori yang ingin diubah!");
+            return;
+        }
+
+        int id = (int) tblKategori.getValueAt(selectedRow, 0);
+        String nama = txtNamaKategori.getText().trim();
+
+        if (nama.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Nama kategori tidak boleh kosong!");
+            return;
+        }
+
+        try (java.sql.Connection conn = Koneksi.createConnection()) {
+            if (conn != null) {
+                Kategori.update(conn, id, nama);
+                txtNamaKategori.setText("");
+                loadKategori();
+            }
+        } catch (java.sql.SQLException ex) {
+            logger.log(java.util.logging.Level.SEVERE, "Error updating kategori", ex);
+        }
+    }//GEN-LAST:event_btnEditKategoriActionPerformed
+
+    private void tblKategoriMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblKategoriMouseClicked
+        int selectedRow = tblKategori.getSelectedRow();
+        if (selectedRow != -1) {
+            txtNamaKategori.setText(tblKategori.getValueAt(selectedRow, 1).toString());
+        }
+    }//GEN-LAST:event_tblKategoriMouseClicked
+
+    private void btnCariKategoriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCariKategoriActionPerformed
+        String query = txtCariKategori.getText().trim();
+        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblKategori.getModel();
+        model.setRowCount(0);
+
+        try (java.sql.Connection conn = Koneksi.createConnection()) {
+            if (conn != null) {
+                java.sql.ResultSet res = Kategori.find(conn, query);
+                while (res != null && res.next()) {
+                    model.addRow(new Object[]{
+                        res.getInt("IdKategori"),
+                        res.getString("NamaKategori")
+                    });
+                }
+            }
+        } catch (java.sql.SQLException ex) {
+            logger.log(java.util.logging.Level.SEVERE, "Error searching kategori", ex);
+        }
+    }//GEN-LAST:event_btnCariKategoriActionPerformed
+
+    private void btnResetKategoriActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetKategoriActionPerformed
+        txtCariKategori.setText("");
+        txtNamaKategori.setText("");
+        loadKategori();
+    }//GEN-LAST:event_btnResetKategoriActionPerformed
 
     /**
      * @param args the command line arguments
