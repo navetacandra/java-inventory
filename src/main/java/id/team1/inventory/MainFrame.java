@@ -9,7 +9,7 @@ package id.team1.inventory;
  * @author team1
  */
 public class MainFrame extends javax.swing.JFrame {
-    
+
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MainFrame.class.getName());
 
     /**
@@ -19,6 +19,7 @@ public class MainFrame extends javax.swing.JFrame {
         initComponents();
         loadKategori();
         loadBarang();
+        loadTransaksi();
     }
 
     private void loadKategoriToCombo() {
@@ -35,7 +36,22 @@ public class MainFrame extends javax.swing.JFrame {
         }
     }
 
+    private void loadTransaksiToCombo() {
+        cmbBarangTransaksi.removeAllItems();
+        try (java.sql.Connection conn = Koneksi.createConnection()) {
+            if (conn != null) {
+                java.sql.ResultSet res = Barang.get(conn);
+                while (res != null && res.next()) {
+                    cmbBarangTransaksi.addItem(res.getInt("IdBarang") + " - " + res.getString("NamaBarang"));
+                }
+            }
+        } catch (java.sql.SQLException e) {
+            logger.log(java.util.logging.Level.SEVERE, "Error loading barang to combo", e);
+        }
+    }
+
     private void loadBarang() {
+        loadTransaksiToCombo();
         javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblBarang.getModel();
         model.setRowCount(0);
         try (java.sql.Connection conn = Koneksi.createConnection()) {
@@ -73,6 +89,28 @@ public class MainFrame extends javax.swing.JFrame {
             logger.log(java.util.logging.Level.SEVERE, "Error loading kategori", e);
         }
     }
+
+    private void loadTransaksi() {
+        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblTransaksi.getModel();
+        model.setRowCount(0);
+        try (java.sql.Connection conn = Koneksi.createConnection()) {
+            if (conn != null) {
+                java.sql.ResultSet res = Transaksi.get(conn);
+                while (res != null && res.next()) {
+                    model.addRow(new Object[]{
+                        res.getInt("IdTransaksi"),
+                        res.getString("NamaBarang"),
+                        res.getString("NamaKategori"),
+                        res.getString("TipeTransaksi"),
+                        res.getInt("JumlahTransaksi")
+                    });
+                }
+            }
+        } catch (java.sql.SQLException e) {
+            logger.log(java.util.logging.Level.SEVERE, "Error loading transaksi", e);
+        }
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.
