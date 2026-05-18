@@ -18,6 +18,27 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
         loadKategori();
+        initEventHandlers();
+    }
+
+    private void initEventHandlers() {
+        btnSimpanKategori.addActionListener(e -> {
+            String nama = txtNamaKategori.getText().trim();
+            if (nama.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Nama kategori tidak boleh kosong!");
+                return;
+            }
+
+            try (java.sql.Connection conn = Koneksi.createConnection()) {
+                if (conn != null) {
+                    Kategori.create(conn, nama);
+                    txtNamaKategori.setText("");
+                    loadKategori();
+                }
+            } catch (java.sql.SQLException ex) {
+                logger.log(java.util.logging.Level.SEVERE, "Error saving kategori", ex);
+            }
+        });
     }
 
     private void loadKategori() {
