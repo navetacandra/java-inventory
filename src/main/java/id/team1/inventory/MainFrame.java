@@ -232,6 +232,7 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel3.setText("Cari :");
 
         btnCariBarang.setText("Cari");
+        btnCariBarang.addActionListener(this::btnCariBarangActionPerformed);
 
         tblBarang.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -551,6 +552,28 @@ public class MainFrame extends javax.swing.JFrame {
         loadKategori();
     }//GEN-LAST:event_btnResetKategoriActionPerformed
 
+
+    private void btnCariBarangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCariBarangActionPerformed
+        String query = txtCariBarang.getText().trim();
+        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblBarang.getModel();
+        model.setRowCount(0);
+
+        try (java.sql.Connection conn = Koneksi.createConnection()) {
+            if (conn != null) {
+                java.sql.ResultSet res = Barang.find(conn, query);
+                while (res != null && res.next()) {
+                    model.addRow(new Object[]{
+                        res.getInt("IdBarang"),
+                        res.getString("NamaBarang"),
+                        res.getString("NamaKategori"),
+                        res.getInt("JumlahBarang")
+                    });
+                }
+            }
+        } catch (java.sql.SQLException ex) {
+            logger.log(java.util.logging.Level.SEVERE, "Error searching barang", ex);
+        }
+    }//GEN-LAST:event_btnCariBarangActionPerformed
     /**
      * @param args the command line arguments
      */
