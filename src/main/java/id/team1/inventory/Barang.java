@@ -46,7 +46,6 @@ public class Barang {
             stmt.setString(2, query);
             stmt.setString(3, Koneksi.prepareLike(query));
             stmt.setString(4, query);
-            System.out.println(stmt.toString());
             ResultSet res = stmt.executeQuery();
             return res;
         } catch (Exception e) {
@@ -76,13 +75,13 @@ public class Barang {
             stmt.execute();
             ResultSet res = stmt.getGeneratedKeys();
             if (res.next()) {
-                System.out.println(res.getInt(1));
                 if (jumlahBarang > 0) {
                     Transaksi.create(
                         sqlCon,
                         res.getInt(1),
                         "Masuk",
-                        jumlahBarang
+                        jumlahBarang,
+                        "Barang baru ditambahkan."
                     );
                 }
             }

@@ -102,7 +102,9 @@ public class MainFrame extends javax.swing.JFrame {
                         res.getString("NamaBarang"),
                         res.getString("NamaKategori"),
                         res.getString("TipeTransaksi"),
-                        res.getInt("JumlahTransaksi")
+                        res.getInt("JumlahTransaksi"),
+                        res.getString("Pesan"),
+                        res.getTimestamp("Timestamp")
                     });
                 }
             }
@@ -162,6 +164,8 @@ public class MainFrame extends javax.swing.JFrame {
         cmbTipeTransaksi = new javax.swing.JComboBox<>();
         jLabel10 = new javax.swing.JLabel();
         txtJumlahTransaksi = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
+        txtPesanTransaksi = new javax.swing.JTextField();
         btnSimpanTransaksi = new javax.swing.JButton();
         btnResetTransaksi = new javax.swing.JButton();
 
@@ -391,11 +395,11 @@ public class MainFrame extends javax.swing.JFrame {
 
             },
             new String [] {
-                "ID", "Barang", "Kategori", "Tipe", "Jumlah"
+                "ID", "Barang", "Kategori", "Tipe", "Jumlah", "Pesan", "Waktu"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false
+                false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
@@ -411,6 +415,8 @@ public class MainFrame extends javax.swing.JFrame {
         cmbTipeTransaksi.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Masuk", "Keluar" }));
 
         jLabel10.setText("Jumlah :");
+
+        jLabel11.setText("Pesan :");
 
         btnSimpanTransaksi.setText("Simpan");
         btnSimpanTransaksi.addActionListener(this::btnSimpanTransaksiActionPerformed);
@@ -444,6 +450,8 @@ public class MainFrame extends javax.swing.JFrame {
                             .addComponent(cmbBarangTransaksi, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jLabel10)
                             .addComponent(txtJumlahTransaksi)
+                            .addComponent(jLabel11)
+                            .addComponent(txtPesanTransaksi)
                             .addComponent(cmbTipeTransaksi, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap(33, Short.MAX_VALUE))
         );
@@ -470,6 +478,10 @@ public class MainFrame extends javax.swing.JFrame {
                         .addComponent(jLabel10)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(txtJumlahTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel11)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txtPesanTransaksi, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addGroup(panelTransaksiLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(btnSimpanTransaksi)
@@ -675,6 +687,7 @@ public class MainFrame extends javax.swing.JFrame {
                 txtNamaBarang.setText("");
                 txtStokBarang.setText("");
                 loadBarang();
+                loadTransaksi();
             }
         } catch (java.sql.SQLException ex) {
             logger.log(java.util.logging.Level.SEVERE, "Error saving barang", ex);
@@ -705,6 +718,7 @@ public class MainFrame extends javax.swing.JFrame {
                     txtNamaBarang.setText("");
                     txtStokBarang.setText("");
                     loadBarang();
+                    loadTransaksi();
                 }
             } catch (java.sql.SQLException ex) {
                 logger.log(java.util.logging.Level.SEVERE, "Error deleting barang", ex);
@@ -766,6 +780,7 @@ public class MainFrame extends javax.swing.JFrame {
                 txtStokBarang.setText("");
                 txtStokBarang.setEnabled(true);
                 loadBarang();
+                loadTransaksi();
             }
         } catch (java.sql.SQLException ex) {
             logger.log(java.util.logging.Level.SEVERE, "Error updating barang", ex);
@@ -830,8 +845,10 @@ public class MainFrame extends javax.swing.JFrame {
                     }
                 }
 
-                Transaksi.create(conn, idBarang, tipe, jumlah);
+                String pesan = txtPesanTransaksi.getText().trim();
+                Transaksi.create(conn, idBarang, tipe, jumlah, pesan);
                 txtJumlahTransaksi.setText("");
+                txtPesanTransaksi.setText("");
                 loadTransaksi();
                 loadBarang(); // Refresh barang to show updated stock
             }
@@ -843,6 +860,7 @@ public class MainFrame extends javax.swing.JFrame {
     private void btnResetTransaksiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetTransaksiActionPerformed
         txtCariTransaksi.setText("");
         txtJumlahTransaksi.setText("");
+        txtPesanTransaksi.setText("");
         if (cmbBarangTransaksi.getItemCount() > 0) {
             cmbBarangTransaksi.setSelectedIndex(0);
         }
@@ -874,6 +892,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> cmbTipeTransaksi;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -898,6 +917,7 @@ public class MainFrame extends javax.swing.JFrame {
     private javax.swing.JTextField txtJumlahTransaksi;
     private javax.swing.JTextField txtNamaBarang;
     private javax.swing.JTextField txtNamaKategori;
+    private javax.swing.JTextField txtPesanTransaksi;
     private javax.swing.JTextField txtStokBarang;
     // End of variables declaration//GEN-END:variables
 }

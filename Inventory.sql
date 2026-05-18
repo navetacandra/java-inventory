@@ -2,15 +2,17 @@ DROP TABLE IF EXISTS Transaksi;
 DROP TABLE IF EXISTS Barang;
 DROP TABLE IF EXISTS Kategori;
 
+SET GLOBAL time_zone = '+07:00';
+
 CREATE TABLE `Kategori` (
   `IdKategori` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  `NamaKategori` varchar(100) NOT NULL UNIQUE
+  `NamaKategori` varchar(50) NOT NULL UNIQUE
 );
 
 CREATE TABLE `Barang` (
   `IdBarang` int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   `IdKategori` int(11) NOT NULL,
-  `NamaBarang` varchar(100) NOT NULL,
+  `NamaBarang` varchar(50) NOT NULL,
   `JumlahBarang` int(11) NOT NULL,
   FOREIGN KEY (`IdKategori`) REFERENCES `Kategori` (`IdKategori`) ON DELETE CASCADE
 );
@@ -20,6 +22,8 @@ CREATE TABLE `Transaksi` (
   `IdBarang` int(11) NOT NULL,
   `TipeTransaksi` enum('Masuk','Keluar') NOT NULL,
   `JumlahTransaksi` int(11) NOT NULL,
+  `Pesan` varchar(50) NOT NULL,
+  `Timestamp` timestamp NOT NULL DEFAULT current_timestamp,
   FOREIGN KEY (`IdBarang`) REFERENCES `Barang` (`IdBarang`) ON DELETE CASCADE
 );
 

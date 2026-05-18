@@ -22,7 +22,7 @@ public class Transaksi {
         PreparedStatement stmt = null;
         try {
             stmt = sqlCon.prepareStatement(
-                "SELECT * FROM Transaksi LEFT OUTER JOIN Barang USING (IdBarang) LEFT OUTER JOIN Kategori USING (IdKategori) ORDER BY IdTransaksi ASC"
+                "SELECT * FROM Transaksi LEFT OUTER JOIN Barang USING (IdBarang) LEFT OUTER JOIN Kategori USING (IdKategori) ORDER BY Timestamp DESC"
             );
             ResultSet res = stmt.executeQuery();
             return res;
@@ -39,7 +39,7 @@ public class Transaksi {
         PreparedStatement stmt = null;
         try {
             stmt = sqlCon.prepareStatement(
-                "SELECT * FROM Transaksi LEFT OUTER JOIN Barang USING (IdBarang) LEFT OUTER JOIN Kategori USING (IdKategori) WHERE IdTransaksi=? ORDER BY IdTransaksi ASC"
+                "SELECT * FROM Transaksi LEFT OUTER JOIN Barang USING (IdBarang) LEFT OUTER JOIN Kategori USING (IdKategori) WHERE IdTransaksi=? ORDER BY Timestamp DESC"
             );
             stmt.setInt(1, idTransaksi);
             ResultSet res = stmt.executeQuery();
@@ -57,16 +57,18 @@ public class Transaksi {
         Connection sqlCon,
         int idBarang,
         String tipeTransaksi,
-        int jumlahTransaksi
+        int jumlahTransaksi,
+        String pesan
     ) {
         PreparedStatement stmt = null;
         try {
             stmt = sqlCon.prepareStatement(
-                "INSERT INTO Transaksi (IdBarang, TipeTransaksi, JumlahTransaksi) VALUES (?, ?, ?)"
+                "INSERT INTO Transaksi (IdBarang, TipeTransaksi, JumlahTransaksi, Pesan) VALUES (?, ?, ?, ?)"
             );
             stmt.setInt(1, idBarang);
             stmt.setString(2, tipeTransaksi);
             stmt.setInt(3, jumlahTransaksi);
+            stmt.setString(4, pesan);
             stmt.execute();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(
