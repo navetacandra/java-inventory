@@ -250,6 +250,11 @@ public class MainFrame extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        tblBarang.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblBarangMouseClicked(evt);
+            }
+        });
         jScrollPane2.setViewportView(tblBarang);
 
         jLabel4.setText("Nama Barang :");
@@ -262,11 +267,13 @@ public class MainFrame extends javax.swing.JFrame {
         btnSimpanBarang.addActionListener(this::btnSimpanBarangActionPerformed);
 
         btnEditBarang.setText("Edit");
+        btnEditBarang.addActionListener(this::btnEditBarangActionPerformed);
 
         btnHapusBarang.setText("Hapus");
         btnHapusBarang.addActionListener(this::btnHapusBarangActionPerformed);
 
         btnResetBarang.setText("Reset");
+        btnResetBarang.addActionListener(this::btnResetBarangActionPerformed);
 
         javax.swing.GroupLayout panelBarangLayout = new javax.swing.GroupLayout(panelBarang);
         panelBarang.setLayout(panelBarangLayout);
@@ -664,6 +671,77 @@ public class MainFrame extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_btnHapusBarangActionPerformed
+
+    private void tblBarangMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblBarangMouseClicked
+        int selectedRow = tblBarang.getSelectedRow();
+        if (selectedRow != -1) {
+            txtNamaBarang.setText(tblBarang.getValueAt(selectedRow, 1).toString());
+            cmbKategoriBarang.setSelectedItem(tblBarang.getValueAt(selectedRow, 2).toString());
+            // Stok awal tidak diubah saat update barang karena update stok lewat transaksi
+            txtStokBarang.setText(tblBarang.getValueAt(selectedRow, 3).toString());
+            txtStokBarang.setEnabled(false); // disable edit stok
+        }
+    }//GEN-LAST:event_tblBarangMouseClicked
+
+    private void btnEditBarangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditBarangActionPerformed
+        int selectedRow = tblBarang.getSelectedRow();
+        if (selectedRow == -1) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Pilih barang yang ingin diubah!");
+            return;
+        }
+
+        int id = (int) tblBarang.getValueAt(selectedRow, 0);
+        String namaBarang = txtNamaBarang.getText().trim();
+        String namaKategori = (String) cmbKategoriBarang.getSelectedItem();
+
+        if (namaBarang.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Nama barang tidak boleh kosong!");
+            return;
+        }
+
+        if (namaKategori == null || namaKategori.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Pilih kategori terlebih dahulu!");
+            return;
+        }
+
+        try (java.sql.Connection conn = Koneksi.createConnection()) {
+            if (conn != null) {
+                int idKategori = -1;
+                try (java.sql.PreparedStatement stmt = conn.prepareStatement("SELECT IdKategori FROM Kategori WHERE NamaKategori = ?")) {
+                    stmt.setString(1, namaKategori);
+                    try (java.sql.ResultSet res = stmt.executeQuery()) {
+                        if (res.next()) {
+                            idKategori = res.getInt("IdKategori");
+                        }
+                    }
+                }
+
+                if (idKategori == -1) {
+                    javax.swing.JOptionPane.showMessageDialog(this, "Kategori tidak ditemukan di database!");
+                    return;
+                }
+
+                Barang.update(conn, id, idKategori, namaBarang);
+                txtNamaBarang.setText("");
+                txtStokBarang.setText("");
+                txtStokBarang.setEnabled(true);
+                loadBarang();
+            }
+        } catch (java.sql.SQLException ex) {
+            logger.log(java.util.logging.Level.SEVERE, "Error updating barang", ex);
+        }
+    }//GEN-LAST:event_btnEditBarangActionPerformed
+
+    private void btnResetBarangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetBarangActionPerformed
+        txtCariBarang.setText("");
+        txtNamaBarang.setText("");
+        txtStokBarang.setText("");
+        txtStokBarang.setEnabled(true);
+        if (cmbKategoriBarang.getItemCount() > 0) {
+            cmbKategoriBarang.setSelectedIndex(0);
+        }
+        loadBarang();
+    }//GEN-LAST:event_btnResetBarangActionPerformed
     /**
      * @param args the command line arguments
      */
