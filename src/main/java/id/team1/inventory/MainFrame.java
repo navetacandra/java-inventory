@@ -39,6 +39,35 @@ public class MainFrame extends javax.swing.JFrame {
                 logger.log(java.util.logging.Level.SEVERE, "Error saving kategori", ex);
             }
         });
+
+        btnHapusKategori.addActionListener(e -> {
+            int selectedRow = tblKategori.getSelectedRow();
+            if (selectedRow == -1) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Pilih kategori yang ingin dihapus!");
+                return;
+            }
+
+            int id = (int) tblKategori.getValueAt(selectedRow, 0);
+            String nama = (String) tblKategori.getValueAt(selectedRow, 1);
+
+            int confirm = javax.swing.JOptionPane.showConfirmDialog(
+                this,
+                "Apakah Anda yakin ingin menghapus kategori '" + nama + "'?",
+                "Konfirmasi Hapus",
+                javax.swing.JOptionPane.YES_NO_OPTION
+            );
+
+            if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+                try (java.sql.Connection conn = Koneksi.createConnection()) {
+                    if (conn != null) {
+                        Kategori.delete(conn, id);
+                        loadKategori();
+                    }
+                } catch (java.sql.SQLException ex) {
+                    logger.log(java.util.logging.Level.SEVERE, "Error deleting kategori", ex);
+                }
+            }
+        });
     }
 
     private void loadKategori() {
