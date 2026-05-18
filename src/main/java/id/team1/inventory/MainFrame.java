@@ -264,6 +264,7 @@ public class MainFrame extends javax.swing.JFrame {
         btnEditBarang.setText("Edit");
 
         btnHapusBarang.setText("Hapus");
+        btnHapusBarang.addActionListener(this::btnHapusBarangActionPerformed);
 
         btnResetBarang.setText("Reset");
 
@@ -632,6 +633,37 @@ public class MainFrame extends javax.swing.JFrame {
             logger.log(java.util.logging.Level.SEVERE, "Error saving barang", ex);
         }
     }//GEN-LAST:event_btnSimpanBarangActionPerformed
+
+    private void btnHapusBarangActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnHapusBarangActionPerformed
+        int selectedRow = tblBarang.getSelectedRow();
+        if (selectedRow == -1) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Pilih barang yang ingin dihapus!");
+            return;
+        }
+
+        int id = (int) tblBarang.getValueAt(selectedRow, 0);
+        String nama = (String) tblBarang.getValueAt(selectedRow, 1);
+
+        int confirm = javax.swing.JOptionPane.showConfirmDialog(
+            this,
+            "Apakah Anda yakin ingin menghapus barang '" + nama + "'?",
+            "Konfirmasi Hapus",
+            javax.swing.JOptionPane.YES_NO_OPTION
+        );
+
+        if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+            try (java.sql.Connection conn = Koneksi.createConnection()) {
+                if (conn != null) {
+                    Barang.delete(conn, id);
+                    txtNamaBarang.setText("");
+                    txtStokBarang.setText("");
+                    loadBarang();
+                }
+            } catch (java.sql.SQLException ex) {
+                logger.log(java.util.logging.Level.SEVERE, "Error deleting barang", ex);
+            }
+        }
+    }//GEN-LAST:event_btnHapusBarangActionPerformed
     /**
      * @param args the command line arguments
      */
