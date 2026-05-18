@@ -18,9 +18,45 @@ public class MainFrame extends javax.swing.JFrame {
     public MainFrame() {
         initComponents();
         loadKategori();
+        loadBarang();
+    }
+
+    private void loadKategoriToCombo() {
+        cmbKategoriBarang.removeAllItems();
+        try (java.sql.Connection conn = Koneksi.createConnection()) {
+            if (conn != null) {
+                java.sql.ResultSet res = Kategori.get(conn);
+                while (res != null && res.next()) {
+                    cmbKategoriBarang.addItem(res.getString("NamaKategori"));
+                }
+            }
+        } catch (java.sql.SQLException e) {
+            logger.log(java.util.logging.Level.SEVERE, "Error loading kategori to combo", e);
+        }
+    }
+
+    private void loadBarang() {
+        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblBarang.getModel();
+        model.setRowCount(0);
+        try (java.sql.Connection conn = Koneksi.createConnection()) {
+            if (conn != null) {
+                java.sql.ResultSet res = Barang.get(conn);
+                while (res != null && res.next()) {
+                    model.addRow(new Object[]{
+                        res.getInt("IdBarang"),
+                        res.getString("NamaBarang"),
+                        res.getString("NamaKategori"),
+                        res.getInt("JumlahBarang")
+                    });
+                }
+            }
+        } catch (java.sql.SQLException e) {
+            logger.log(java.util.logging.Level.SEVERE, "Error loading barang", e);
+        }
     }
 
     private void loadKategori() {
+        loadKategoriToCombo();
         javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblKategori.getModel();
         model.setRowCount(0);
         try (java.sql.Connection conn = Koneksi.createConnection()) {
