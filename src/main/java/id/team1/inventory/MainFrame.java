@@ -17,6 +17,25 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {
         initComponents();
+        loadKategori();
+    }
+
+    private void loadKategori() {
+        javax.swing.table.DefaultTableModel model = (javax.swing.table.DefaultTableModel) tblKategori.getModel();
+        model.setRowCount(0);
+        try (java.sql.Connection conn = Koneksi.createConnection()) {
+            if (conn != null) {
+                java.sql.ResultSet res = Kategori.get(conn);
+                while (res != null && res.next()) {
+                    model.addRow(new Object[]{
+                        res.getInt("IdKategori"),
+                        res.getString("NamaKategori")
+                    });
+                }
+            }
+        } catch (java.sql.SQLException e) {
+            logger.log(java.util.logging.Level.SEVERE, "Error loading kategori", e);
+        }
     }
 
     /**
