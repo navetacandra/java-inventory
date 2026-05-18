@@ -628,11 +628,17 @@
               <Properties>
                 <Property name="text" type="java.lang.String" value="Simpan"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnSimpanTransaksiActionPerformed"/>
+              </Events>
             </Component>
             <Component class="javax.swing.JButton" name="btnResetTransaksi">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Reset"/>
               </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnResetTransaksiActionPerformed"/>
+              </Events>
             </Component>
           </SubComponents>
         </Container>

@@ -413,8 +413,10 @@ public class MainFrame extends javax.swing.JFrame {
         jLabel10.setText("Jumlah :");
 
         btnSimpanTransaksi.setText("Simpan");
+        btnSimpanTransaksi.addActionListener(this::btnSimpanTransaksiActionPerformed);
 
         btnResetTransaksi.setText("Reset");
+        btnResetTransaksi.addActionListener(this::btnResetTransaksiActionPerformed);
 
         javax.swing.GroupLayout panelTransaksiLayout = new javax.swing.GroupLayout(panelTransaksi);
         panelTransaksi.setLayout(panelTransaksiLayout);
@@ -780,6 +782,73 @@ public class MainFrame extends javax.swing.JFrame {
         }
         loadBarang();
     }//GEN-LAST:event_btnResetBarangActionPerformed
+
+    private void btnSimpanTransaksiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSimpanTransaksiActionPerformed
+        String selectedBarang = (String) cmbBarangTransaksi.getSelectedItem();
+        String tipe = (String) cmbTipeTransaksi.getSelectedItem();
+        String jumlahText = txtJumlahTransaksi.getText().trim();
+
+        if (selectedBarang == null || selectedBarang.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Pilih barang terlebih dahulu!");
+            return;
+        }
+
+        if (jumlahText.isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Jumlah transaksi tidak boleh kosong!");
+            return;
+        }
+
+        int jumlah = 0;
+        try {
+            jumlah = Integer.parseInt(jumlahText);
+            if (jumlah <= 0) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Jumlah transaksi harus lebih dari 0!");
+                return;
+            }
+        } catch (NumberFormatException ex) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Jumlah transaksi harus berupa angka valid!");
+            return;
+        }
+
+        int idBarang = Integer.parseInt(selectedBarang.split(" - ")[0]);
+
+        try (java.sql.Connection conn = Koneksi.createConnection()) {
+            if (conn != null) {
+                // If "Keluar", check if enough stock
+                if ("Keluar".equals(tipe)) {
+                    try (java.sql.PreparedStatement stmt = conn.prepareStatement("SELECT JumlahBarang FROM Barang WHERE IdBarang = ?")) {
+                        stmt.setInt(1, idBarang);
+                        try (java.sql.ResultSet res = stmt.executeQuery()) {
+                            if (res.next()) {
+                                int stok = res.getInt("JumlahBarang");
+                                if (stok < jumlah) {
+                                    javax.swing.JOptionPane.showMessageDialog(this, "Stok tidak mencukupi! Stok saat ini: " + stok);
+                                    return;
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Transaksi.create(conn, idBarang, tipe, jumlah);
+                txtJumlahTransaksi.setText("");
+                loadTransaksi();
+                loadBarang(); // Refresh barang to show updated stock
+            }
+        } catch (java.sql.SQLException ex) {
+            logger.log(java.util.logging.Level.SEVERE, "Error saving transaksi", ex);
+        }
+    }//GEN-LAST:event_btnSimpanTransaksiActionPerformed
+
+    private void btnResetTransaksiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnResetTransaksiActionPerformed
+        txtCariTransaksi.setText("");
+        txtJumlahTransaksi.setText("");
+        if (cmbBarangTransaksi.getItemCount() > 0) {
+            cmbBarangTransaksi.setSelectedIndex(0);
+        }
+        cmbTipeTransaksi.setSelectedIndex(0);
+        loadTransaksi();
+    }//GEN-LAST:event_btnResetTransaksiActionPerformed
     /**
      * @param args the command line arguments
      */
