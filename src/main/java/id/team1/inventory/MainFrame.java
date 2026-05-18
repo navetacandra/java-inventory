@@ -61,10 +61,47 @@ public class MainFrame extends javax.swing.JFrame {
                 try (java.sql.Connection conn = Koneksi.createConnection()) {
                     if (conn != null) {
                         Kategori.delete(conn, id);
+                        txtNamaKategori.setText("");
                         loadKategori();
                     }
                 } catch (java.sql.SQLException ex) {
                     logger.log(java.util.logging.Level.SEVERE, "Error deleting kategori", ex);
+                }
+            }
+        });
+
+        btnEditKategori.addActionListener(e -> {
+            int selectedRow = tblKategori.getSelectedRow();
+            if (selectedRow == -1) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Pilih kategori yang ingin diubah!");
+                return;
+            }
+
+            int id = (int) tblKategori.getValueAt(selectedRow, 0);
+            String nama = txtNamaKategori.getText().trim();
+
+            if (nama.isEmpty()) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Nama kategori tidak boleh kosong!");
+                return;
+            }
+
+            try (java.sql.Connection conn = Koneksi.createConnection()) {
+                if (conn != null) {
+                    Kategori.update(conn, id, nama);
+                    txtNamaKategori.setText("");
+                    loadKategori();
+                }
+            } catch (java.sql.SQLException ex) {
+                logger.log(java.util.logging.Level.SEVERE, "Error updating kategori", ex);
+            }
+        });
+
+        tblKategori.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent e) {
+                int selectedRow = tblKategori.getSelectedRow();
+                if (selectedRow != -1) {
+                    txtNamaKategori.setText(tblKategori.getValueAt(selectedRow, 1).toString());
                 }
             }
         });
