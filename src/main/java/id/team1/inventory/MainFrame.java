@@ -18,9 +18,43 @@ public class MainFrame extends javax.swing.JFrame {
      */
     public MainFrame() {
         initComponents();
+        setupTableRenderers();
         loadKategori();
         loadBarang();
         loadTransaksi();
+    }
+
+    private void setupTableRenderers() {
+        tblBarang.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
+            @Override
+            public java.awt.Component getTableCellRendererComponent(javax.swing.JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+                java.awt.Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+                
+                int stok = 0;
+                try {
+                    Object stokValue = table.getValueAt(row, 3);
+                    if (stokValue != null) {
+                        stok = Integer.parseInt(stokValue.toString());
+                    }
+                } catch (NumberFormatException e) {
+                    stok = 0;
+                }
+
+                if (stok < 5) {
+                    c.setBackground(java.awt.Color.RED);
+                    c.setForeground(java.awt.Color.WHITE);
+                } else {
+                    if (isSelected) {
+                        c.setBackground(table.getSelectionBackground());
+                        c.setForeground(table.getSelectionForeground());
+                    } else {
+                        c.setBackground(table.getBackground());
+                        c.setForeground(table.getForeground());
+                    }
+                }
+                return c;
+            }
+        });
     }
 
     private void loadKategoriToCombo() {
